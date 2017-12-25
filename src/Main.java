@@ -5,6 +5,7 @@ import javafx.scene.image.WritableImage;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Rumbler;
 
 public class Main {
 
@@ -35,8 +36,13 @@ public class Main {
 
         Boolean stopped = false;
 
-        controller.poll();
-        System.out.println(controller.getComponent(components[5].getIdentifier()).getPollData());
+
+        while(true){
+            controller.poll();
+            System.out.println(components[5].getPollData());
+        }
+
+
 
 
     }
