@@ -60,9 +60,10 @@ public class Main {
                 Component.Identifier identifier = comp.getIdentifier();
                 float compData = comp.getPollData();
 
-                if (identifier == Component.Identifier.Button._1) {
+                if (identifier == Component.Identifier.Axis.Y) {
                     YAxisValue = convertToPercentage(compData);
                     try {
+                        leftMotor.setSpeed(YAxisValue);
                         leftMotor.forward();
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -72,6 +73,7 @@ public class Main {
                     RZAxisValue = convertToPercentage(compData);
                     try {
                         rightMotor.setSpeed(RZAxisValue);
+                        rightMotor.forward();
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
