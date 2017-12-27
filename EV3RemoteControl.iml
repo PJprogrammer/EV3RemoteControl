@@ -10,5 +10,6 @@
     <orderEntry type="library" name="jinput-2.0.7" level="project" />
     <orderEntry type="library" name="jutils-1.0.0" level="project" />
     <orderEntry type="library" name="jinput-platform-2.0.7-natives-windows" level="project" />
+    <orderEntry type="library" name="ev3classes" level="project" />
   </component>
 </module>
