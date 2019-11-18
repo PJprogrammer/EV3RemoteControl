@@ -1,7 +1,4 @@
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.WritableImage;
+
 import lejos.hardware.BrickFinder;
 import lejos.hardware.motor.BaseRegulatedMotor;
 import lejos.remote.ev3.RMIRegulatedMotor;
@@ -18,7 +15,8 @@ public class Main {
     RemoteEV3 ev3;
     RMIRegulatedMotor leftMotor;
     RMIRegulatedMotor rightMotor;
-
+    RMIRegulatedMotor clawMotor;
+    private static int MAXSPEED = 400;
 
     public Main(Controller[] controllers) {
         int selectedController = 0;
@@ -40,7 +38,7 @@ public class Main {
     public void connectToEV3(){
         // Detecting EV3 Brick
         try {
-            ev3 = new RemoteEV3("10.0.0.24");
+            ev3 = new RemoteEV3("10.0.0.17");
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -52,6 +50,7 @@ public class Main {
         // Creating objects for motor
         leftMotor = ev3.createRegulatedMotor("B", 'L');
         rightMotor = ev3.createRegulatedMotor("C", 'L');
+        clawMotor = ev3.createRegulatedMotor("A",'M');
 
         Boolean stopped = false;
         EventQueue eventQueue = controller.getEventQueue();
@@ -74,19 +73,35 @@ public class Main {
                     YAxisValue = convertToPercentage(compData);
                     try {
                         leftMotor.setSpeed(YAxisValue);
-                        leftMotor.forward();
+                        if(YAxisValue >= 0)
+                            leftMotor.forward();
+                        else
+                            leftMotor.backward();
                     } catch (RemoteException e) {
                         e.printStackTrace();
+
                     }
                 }
                 else if (identifier == Component.Identifier.Axis.RZ) {
                     RZAxisValue = convertToPercentage(compData);
                     try {
                         rightMotor.setSpeed(RZAxisValue);
-                        rightMotor.forward();
+                        if(RZAxisValue >= 0)
+                            rightMotor.forward();
+                        else
+                            rightMotor.backward();
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
+                }
+                else if(identifier == Component.Identifier.Button._1) {
+
+                    try{clawMotor.setSpeed(100);
+                        clawMotor.forward();} catch (Exception e) {}
+                }
+                else if(identifier == Component.Identifier.Button._3) {
+                    try{ clawMotor.setSpeed(100);
+                        clawMotor.backward();} catch (Exception e) {}
                 }
                 else if (identifier == Component.Identifier.Button._0){
                     stopped = true;
@@ -97,15 +112,17 @@ public class Main {
         try {
             leftMotor.stop(true);
             rightMotor.stop(true);
+            clawMotor.stop(true);
             leftMotor.close();
             rightMotor.close();
+            clawMotor.close();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
     public int convertToPercentage(float compData){
-        return (int)-((((2 - (1 - compData)) * 100) / 2)-50);
+        return (int)-((((2 - (1 - compData)) * 100) / 2)-50)*(MAXSPEED/50);
     }
 
     public static void main(String[] args) {
